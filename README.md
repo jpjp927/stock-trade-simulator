@@ -2,13 +2,16 @@
 
 This is a Python program that simulates stock trades based on a given strategy. It uses the *yfinance* module to download stock data.
 
+## Requirements
+* Python 3.9.7
+* yfinance  0.1.70
+
 ## Installation
 
 1. Clone this repository:
 
 ```bash=
-Copy code
-git clone <https://github.com/jpjp927/stock-trade-simulator>
+git clone git@github.com:jpjp927/stock-trade-simulator.git
 cd stock-trade-simulator
 ```
 
