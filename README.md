@@ -4,8 +4,10 @@ This is a Python program that simulates stock trades based on a given strategy. 
 
 ## Requirements
 * Python 3.9.7
-* yfinance  0.1.70
-
+* The rest of the packages can be installed using 
+  <code bash>
+  pip install -r requirements.txt
+  </code>
 ## Installation
 
 1. Clone this repository:
