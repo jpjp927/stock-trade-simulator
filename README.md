@@ -4,10 +4,7 @@ This is a Python program that simulates stock trades based on a given strategy. 
 
 ## Requirements
 * Python 3.9.7
-* The rest of the packages can be installed using 
-  <code bash>
-  pip install -r requirements.txt
-  </code>
+* The rest of the package dependencies are listed in [requirements.txt](requirements.txt)
 ## Installation
 
 1. Clone this repository:
@@ -20,7 +17,7 @@ cd stock-trade-simulator
 2. Install required module:
 
 ```bash=
-pip install yfinance
+pip install -r requirements.txt
 ```
 
 ## Usage
