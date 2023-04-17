@@ -1,9 +1,9 @@
 import yfinance as yf
-from strategy import *
+from strategy import Pullback
 from datetime import datetime
 
 class StockTradeSimulator:
-    def __init__(self, symbol, start_date, end_date, initial_capital):
+    def __init__(self, symbol, start_date, end_date, initial_capital, strategy):
         self.symbol = symbol
         self.start_date = start_date
         self.end_date = end_date
@@ -12,6 +12,9 @@ class StockTradeSimulator:
         self.shares  = 0
         # Download data
         self.stock_data = yf.download(symbol, start=start_date, end=end_date)
+        self.strategy = strategy
+        if self.strategy.do_preprocessing:
+            self.stock_data = self.strategy.preprocess_data(self.stock_data)
 
     def buy(self, share, price):
         cost = share * price
@@ -35,13 +38,12 @@ class StockTradeSimulator:
         years = (d2 - d1).days/365   
         return ((self.capital / self.initial_capital)**(1/years))-1
     
-    def simulate(self, strategy):
+    def simulate(self):
         pre_buy_price = 0
-
         # Sweep everyday
         for date, row in self.stock_data.iterrows():
             # The strategy should tell us buy, sell or hold
-            action = strategy(row)
+            action = self.strategy(row)
             
             # Buy
             if action == 'buy':
@@ -66,28 +68,22 @@ class StockTradeSimulator:
     
         return final_capital, final_shares, self.capital, irr
 
-# def pullback_strategy(row, threshold):
-#     if row['Close'] < row['SMA20'] * (1 - threshold):
-#         return 'buy'
-#     elif row['Close'] > row['SMA20']:
-#         return 'sell'
-#     else:
-#         return 'hold'
-
 if __name__ == '__main__':
     symbol = '0050.tw'          # Stock Name
     start_date = '2001-01-01'   # Start Date
     end_date = '2022-03-02'     # End Date
     initial_capital = 10000     # Budget
-    threshold = 0.01            # Safty zone
+    
+    strategy = "pullback"
+    if strategy == "pullback":
+        trading_strategy = Pullback()
+    else:
+        raise Exception("The strategy is not implemented yet")
 
     # Initialize Simulator
-    simulator = StockTradeSimulator(symbol, start_date, end_date, initial_capital)
-    # Calculate Simple Moving Average -- 20 days
-    simulator.stock_data['SMA20'] = simulator.stock_data['Close'].rolling(window=20).mean()
-
+    simulator = StockTradeSimulator(symbol, start_date, end_date, initial_capital, trading_strategy)
     # Start simulation
-    final_capital, final_shares, net, irr = simulator.simulate(lambda row: pullback_strategy(row, threshold))
+    final_capital, final_shares, net, irr = simulator.simulate()
 
 
     print(f'Final Capital: {final_capital:.2f}')
