@@ -76,7 +76,7 @@ if __name__ == '__main__':
     initial_capital = 10000     # Budget
     
     # Initailize strategy
-    strategy_name = "Pullback"
+    strategy_name = "Momentum"
     try:
         trading_strategy = getattr(strategy, strategy_name)()
     except:
