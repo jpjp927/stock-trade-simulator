@@ -1,5 +1,6 @@
 import yfinance as yf
-from strategy import Pullback
+# from strategy import *
+import strategy
 from datetime import datetime
 
 class StockTradeSimulator:
@@ -74,19 +75,22 @@ if __name__ == '__main__':
     end_date = '2022-03-02'     # End Date
     initial_capital = 10000     # Budget
     
-    strategy = "pullback"
-    if strategy == "pullback":
-        trading_strategy = Pullback()
-    else:
-        raise Exception("The strategy is not implemented yet")
+    # Initailize strategy
+    strategy_name = "Pullback"
+    try:
+        trading_strategy = getattr(strategy, strategy_name)()
+    except:
+        print("The strategy is not implemented yet")
+        exit()
 
     # Initialize Simulator
     simulator = StockTradeSimulator(symbol, start_date, end_date, initial_capital, trading_strategy)
     # Start simulation
     final_capital, final_shares, net, irr = simulator.simulate()
 
-
+    print("===================")
     print(f'Final Capital: {final_capital:.2f}')
     print(f'Shares: {final_shares:.2f}')
     print(f'Net: {net:.2f}')
     print(f'IRR: {irr:.2f}%')
+    print("===================")
