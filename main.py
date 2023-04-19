@@ -1,19 +1,24 @@
+import argparse
 import yfinance as yf
-# from strategy import *
 import strategy
 from datetime import datetime
 
 class StockTradeSimulator:
-    def __init__(self, symbol, start_date, end_date, initial_capital, strategy):
-        self.symbol = symbol
-        self.start_date = start_date
-        self.end_date = end_date
-        self.initial_capital = initial_capital
-        self.capital = initial_capital
+    def __init__(self, args):
+        self.symbol = args.symbol
+        self.start_date = args.start_date
+        self.end_date = args.end_date
+        self.initial_capital = args.initial_capital
+        try:
+            self.strategy = getattr(strategy, args.strategy)()
+        except:
+            print("[Error] The strategy is not implemented yet")
+            exit()
+
+        self.capital = self.initial_capital
         self.shares  = 0
         # Download data
-        self.stock_data = yf.download(symbol, start=start_date, end=end_date)
-        self.strategy = strategy
+        self.stock_data = yf.download(self.symbol, start=self.start_date, end=self.end_date)
         if self.strategy.do_preprocessing:
             self.stock_data = self.strategy.preprocess_data(self.stock_data)
 
@@ -70,21 +75,16 @@ class StockTradeSimulator:
         return final_capital, final_shares, self.capital, irr
 
 if __name__ == '__main__':
-    symbol = '0050.tw'          # Stock Name
-    start_date = '2001-01-01'   # Start Date
-    end_date = '2022-03-02'     # End Date
-    initial_capital = 10000     # Budget
-    
-    # Initailize strategy
-    strategy_name = "Pullback"
-    try:
-        trading_strategy = getattr(strategy, strategy_name)()
-    except:
-        print("The strategy is not implemented yet")
-        exit()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-t", "--symbol", help="stock ticker", default="0050.tw")
+    parser.add_argument("-b", "--start_date", help="start date of simulation", default="2001-01-01")
+    parser.add_argument("-e", "--end_date", help="end date of simulation", default="2022-03-02")
+    parser.add_argument("-i", "--initial_capital", help="cappital before on simulatoin", default=10000)
+    parser.add_argument("-s", "--strategy", help="trading strategy", default="Pullback")
+    args = parser.parse_args()
 
     # Initialize Simulator
-    simulator = StockTradeSimulator(symbol, start_date, end_date, initial_capital, trading_strategy)
+    simulator = StockTradeSimulator(args)
     # Start simulation
     final_capital, final_shares, net, irr = simulator.simulate()
 
